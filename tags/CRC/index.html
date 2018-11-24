@@ -6,16 +6,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="GRXself&#39;s blog">
-    <title>GRXself&#39;s blog</title>
+    <title>标签: CRC - GRXself&#39;s blog</title>
     <meta name="author" content="GRXself">
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"Website","@id":"https://grxself.github.io","author":{"@type":"Person","name":"GRXself","sameAs":[],"image":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg"},"name":"GRXself's blog","description":"personal blog","url":"https://grxself.github.io"}</script>
+    <script type="application/ld+json">{}</script>
     <meta name="description" content="personal blog">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="GRXself&#39;s blog">
-<meta property="og:url" content="https://grxself.github.io/index.html">
+<meta property="og:url" content="https://grxself.github.io/tags/CRC/index.html">
 <meta property="og:site_name" content="GRXself&#39;s blog">
 <meta property="og:description" content="personal blog">
 <meta property="og:locale" content="zh-cn">
@@ -202,7 +202,8 @@
                  class="
                         hasCoverMetaIn
                         ">
-                <section class="postShorten-group main-content-wrap">
+                
+    <section class="postShorten-group main-content-wrap">
     
     
     <article class="postShorten postShorten--thumbnailimg-bottom">
@@ -251,63 +252,6 @@
                     
                         <p>
                             <a href="/2018/11/24/使用zip4j遇到的CRC错误（invalid CRC for file）———_字符造成的异常/#post-footer" class="postShorten-excerpt_link link">
-                                评论和共享
-                            </a>
-                        </p>
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="/2018/06/13/初次使用dubbo框架遇见的坑/">
-                            初次使用dubbo框架遇见的坑
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2018-06-13T16:08:37+08:00">
-	
-		    6月 13, 2018
-    	
-    </time>
-    
-        <span>发布在 </span>
-        
-    <a class="category-link" href="/categories/分布式系统/">分布式系统</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-content">
-                    <p>按照dubbo首页的quick start入门，provider可以正常启动，但是consumer一直报错。<br>按照Demo写的代码运行Cunsummer时 <code>Failed to check the status of the service com.alibaba.dubbo.demo.DemoService</code>,找到了一个貌似指出问题的<a href="https://www.jianshu.com/p/3646263199a1" target="_blank" rel="noopener">blog</a>，里面提到</p>
-<blockquote>
-<p>根本原因是源码中会判断发送给consumer的服务消息是采用单播还是组播，因为虚拟网卡对ip地址的影响导致判断逻辑出错，误认为consumer可以接收到单播，但其实consumer在收到单播消息之前provider自己就把这个消息给抢着处理了（因为provider和consumer在同一台机器上，相当于provider自发自收），导致consumer无法获取服务消息。此问题在linux系统上实验时又无法复现，因为linux和windows的接口对待是否回环是不同的，linux下的consumer可以在provider之先获取到单播消息。</p>
-</blockquote>
-<p>并给出了解决方法：  </p>
-<blockquote>
-<p>1、禁用虚拟网卡。<br>2、在两台机器上分别部署<br>3、采用其它registry<br>4、将服务提供者的spring配置文件中改为(注意url后面的参数配置)<br><code>&lt;dubbo:registry address=&quot;multicast://224.5.6.7:1234?unicast=false&quot;/&gt;</code></p>
-</blockquote>
-<p>但是<strong>1、2、4在分别试过后都没用</strong>，最后我选择使用zookeeper来解决，也就是3中的方法，最后总算成功。但是dubbo首页给的方法真的很坑，muticast居然会报错，虽然根本原因<strong>可能是由windows系统引起的</strong>，以后需要仔细了解下多播，看看到底是怎么回事。</p>
-
-                    
-                        
-
-                    
-                    
-                        <p>
-                            <a href="/2018/06/13/初次使用dubbo框架遇见的坑/#post-footer" class="postShorten-excerpt_link link">
                                 评论和共享
                             </a>
                         </p>
