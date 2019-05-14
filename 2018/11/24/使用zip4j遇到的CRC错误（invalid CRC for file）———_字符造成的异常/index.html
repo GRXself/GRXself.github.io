@@ -11,16 +11,16 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"GRXself","sameAs":[],"image":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg"},"articleBody":"今天遇到了一个棘手的解压问题，先描述一下大致的业务情况。压缩包是自己写的C#程序生成的（有加密），使用的是ICSharpCode.SharpZipLib，然后C#程序也可以解压这个加密的压缩包。这个加密的压缩包最终会上传到javaweb服务器上（springboot+tomcat+MySQL），javaweb项目使用的是zip4j。\n结果客户提交上来的用C#程序生成的压缩包，无论是在C#程序上还是在java程序上都不能顺利解压（总共有200多文件夹，包含文件，但是解压到二十多个文件夹的时候出了问题）。\n我尝试使用7Zip这个软件直接解压压缩包，发现压缩包可以正常解压，也不会报错。\n在这之后我又使用我的C#程序对7Zip解压出来的文件重新进行压缩，然后发现我重新生成的文件在C#和java两边都能够正常解压。\n难道是客户提交的压缩包有问题？但是7Zip解压的时候没有任何报错啊！\n于是我开始在java程序那边打了断点进行调试，异常是：net.lingala.zip4j.exception.ZipException: net.lingala.zip4j.exception.ZipException: invalid CRC for file: XXXX(此处省略文件名）\n然后我在zip4j找到了两个讨论CRC问题的贴子#贴子1、  #贴子2，发现zip4j最新版本（1.3.2）确实存在CRC的bug。\n但是奇怪的是C#版本为什么也会有类似的问题？于是我用7Zip的file manager查看了用户提交的压缩包（存在异常）和我自己重新生成的压缩包（一切正常），在仔细对比之后发现异常压缩包停止解压的文件名包含_，用file manager查看发现异常的压缩包文件名中的_显示为?，而正常的压缩包则正常显示_。\n由于客户那边周末休假，所以无法得知客户对压缩包做过什么，也暂时无法获取用户的系统情况，但是我猜测可能是由于客户系统编码的原因导致_字符出现了异常，所以目前的解决方案是禁止客户在命名的时候使用_。\n","dateCreated":"2018-11-24T21:56:00+08:00","dateModified":"2018-11-24T22:22:23+08:00","datePublished":"2018-11-24T21:56:00+08:00","description":"","headline":"使用zip4j遇到的CRC错误（invalid CRC for file）———\"_\"字符造成的异常","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://grxself.github.io/2018/11/24/使用zip4j遇到的CRC错误（invalid CRC for file）———_字符造成的异常/"},"publisher":{"@type":"Organization","name":"GRXself","sameAs":[],"image":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg","logo":{"@type":"ImageObject","url":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg"}},"url":"https://grxself.github.io/2018/11/24/使用zip4j遇到的CRC错误（invalid CRC for file）———_字符造成的异常/","keywords":"zip4j, CRC, 坑"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"GRXself","sameAs":[],"image":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg"},"articleBody":"今天遇到了一个棘手的解压问题，先描述一下大致的业务情况。压缩包是自己写的C#程序生成的（有加密），使用的是ICSharpCode.SharpZipLib，然后C#程序也可以解压这个加密的压缩包。这个加密的压缩包最终会上传到javaweb服务器上（springboot+tomcat+MySQL），javaweb项目使用的是zip4j。\n结果客户提交上来的用C#程序生成的压缩包，无论是在C#程序上还是在java程序上都不能顺利解压（总共有200多文件夹，包含文件，但是解压到二十多个文件夹的时候出了问题）。\n我尝试使用7Zip这个软件直接解压压缩包，发现压缩包可以正常解压，也不会报错。\n在这之后我又使用我的C#程序对7Zip解压出来的文件重新进行压缩，然后发现我重新生成的文件在C#和java两边都能够正常解压。\n难道是客户提交的压缩包有问题？但是7Zip解压的时候没有任何报错啊！\n于是我开始在java程序那边打了断点进行调试，异常是：net.lingala.zip4j.exception.ZipException: net.lingala.zip4j.exception.ZipException: invalid CRC for file: XXXX(此处省略文件名）\n然后我在zip4j找到了两个讨论CRC问题的贴子#贴子1、  #贴子2，发现zip4j最新版本（1.3.2）确实存在CRC的bug。\n但是奇怪的是C#版本为什么也会有类似的问题？于是我用7Zip的file manager查看了用户提交的压缩包（存在异常）和我自己重新生成的压缩包（一切正常），在仔细对比之后发现异常压缩包停止解压的文件名包含_，用file manager查看发现异常的压缩包文件名中的_显示为?，而正常的压缩包则正常显示_。\n由于客户那边周末休假，所以无法得知客户对压缩包做过什么，也暂时无法获取用户的系统情况，但是我猜测可能是由于客户系统编码的原因导致_字符出现了异常，所以目前的解决方案是禁止客户在命名的时候使用_。\n\n2019-05-14更新：此问题根源与zip4j无关，如需了解造成文中问题的根源请移步另一篇文章光驱异常导致的数据读取异常\n","dateCreated":"2018-11-24T21:56:00+08:00","dateModified":"2019-05-14T19:36:34+08:00","datePublished":"2018-11-24T21:56:00+08:00","description":"","headline":"使用zip4j遇到的CRC错误（invalid CRC for file）———\"_\"字符造成的异常","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://grxself.github.io/2018/11/24/使用zip4j遇到的CRC错误（invalid CRC for file）———_字符造成的异常/"},"publisher":{"@type":"Organization","name":"GRXself","sameAs":[],"image":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg","logo":{"@type":"ImageObject","url":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg"}},"url":"https://grxself.github.io/2018/11/24/使用zip4j遇到的CRC错误（invalid CRC for file）———_字符造成的异常/","keywords":"坑, zip4j, CRC"}</script>
     <meta name="description" content="今天遇到了一个棘手的解压问题，先描述一下大致的业务情况。压缩包是自己写的C#程序生成的（有加密），使用的是ICSharpCode.SharpZipLib，然后C#程序也可以解压这个加密的压缩包。这个加密的压缩包最终会上传到javaweb服务器上（springboot+tomcat+MySQL），javaweb项目使用的">
-<meta name="keywords" content="zip4j,CRC,坑">
+<meta name="keywords" content="坑,zip4j,CRC">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="使用zip4j遇到的CRC错误（invalid CRC for file）———&quot;_&quot;字符造成的异常">
 <meta property="og:url" content="https://grxself.github.io/2018/11/24/使用zip4j遇到的CRC错误（invalid CRC for file）———_字符造成的异常/index.html">
 <meta property="og:site_name" content="GRXself&#39;s blog">
 <meta property="og:description" content="今天遇到了一个棘手的解压问题，先描述一下大致的业务情况。压缩包是自己写的C#程序生成的（有加密），使用的是ICSharpCode.SharpZipLib，然后C#程序也可以解压这个加密的压缩包。这个加密的压缩包最终会上传到javaweb服务器上（springboot+tomcat+MySQL），javaweb项目使用的是zip4j。 结果客户提交上来的用C#程序生成的压缩包，无论是在C#程序上还是">
 <meta property="og:locale" content="zh-cn">
-<meta property="og:updated_time" content="2018-11-24T14:22:23.132Z">
+<meta property="og:updated_time" content="2019-05-14T11:36:34.778Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用zip4j遇到的CRC错误（invalid CRC for file）———&quot;_&quot;字符造成的异常">
 <meta name="twitter:description" content="今天遇到了一个棘手的解压问题，先描述一下大致的业务情况。压缩包是自己写的C#程序生成的（有加密），使用的是ICSharpCode.SharpZipLib，然后C#程序也可以解压这个加密的压缩包。这个加密的压缩包最终会上传到javaweb服务器上（springboot+tomcat+MySQL），javaweb项目使用的是zip4j。 结果客户提交上来的用C#程序生成的压缩包，无论是在C#程序上还是">
@@ -245,6 +245,8 @@
 <p>然后我在zip4j找到了两个讨论CRC问题的贴子<a href="http://www.lingala.net/zip4j/forum/index.php?topic=365.0" target="_blank" rel="noopener">#贴子1</a>、  <a href="http://www.lingala.net/zip4j/forum/index.php?topic=332.0" target="_blank" rel="noopener">#贴子2</a>，发现zip4j最新版本（1.3.2）确实存在CRC的bug。</p>
 <p>但是奇怪的是C#版本为什么也会有类似的问题？于是我用7Zip的file manager查看了用户提交的压缩包（存在异常）和我自己重新生成的压缩包（一切正常），在仔细对比之后发现异常压缩包停止解压的文件名包含<code>_</code>，用file manager查看发现异常的压缩包文件名中的<code>_</code>显示为<code>?</code>，而正常的压缩包则正常显示<code>_</code>。</p>
 <p>由于客户那边周末休假，所以无法得知客户对压缩包做过什么，也暂时无法获取用户的系统情况，但是我猜测可能是由于客户系统编码的原因导致<code>_</code>字符出现了异常，所以目前的解决方案是禁止客户在命名的时候使用<code>_</code>。</p>
+<hr>
+<p>2019-05-14更新：<br>此问题根源与zip4j无关，如需了解造成文中问题的根源请移步另一篇文章<a href="https://grxself.github.io/2019/05/14/光驱异常导致的数据读取异常/">光驱异常导致的数据读取异常</a></p>
 
             
 
@@ -265,7 +267,8 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/05/14/Java Overflow and Underflow/" data-tooltip="Java Overflow and Underflow" aria-label="上一篇: Java Overflow and Underflow">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
@@ -284,7 +287,7 @@
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
@@ -326,7 +329,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -346,7 +349,7 @@
 
                 <footer id="footer" class="main-content-wrap">
     <span class="copyrights">
-        Copyrights &copy; 2018 GRXself. All Rights Reserved.
+        Copyrights &copy; 2019 GRXself. All Rights Reserved.
     </span>
 </footer>
 
@@ -358,7 +361,8 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/05/14/Java Overflow and Underflow/" data-tooltip="Java Overflow and Underflow" aria-label="上一篇: Java Overflow and Underflow">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
@@ -377,7 +381,7 @@
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
@@ -419,7 +423,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>

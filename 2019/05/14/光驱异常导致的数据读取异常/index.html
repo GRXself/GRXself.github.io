@@ -6,24 +6,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="GRXself&#39;s blog">
-    <title>初次使用dubbo框架遇见的坑 - GRXself&#39;s blog</title>
+    <title>光驱异常导致的数据读取异常 - GRXself&#39;s blog</title>
     <meta name="author" content="GRXself">
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"GRXself","sameAs":[],"image":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg"},"articleBody":"按照dubbo首页的quick start入门，provider可以正常启动，但是consumer一直报错。按照Demo写的代码运行Cunsummer时 Failed to check the status of the service com.alibaba.dubbo.demo.DemoService,找到了一个貌似指出问题的blog，里面提到\n\n根本原因是源码中会判断发送给consumer的服务消息是采用单播还是组播，因为虚拟网卡对ip地址的影响导致判断逻辑出错，误认为consumer可以接收到单播，但其实consumer在收到单播消息之前provider自己就把这个消息给抢着处理了（因为provider和consumer在同一台机器上，相当于provider自发自收），导致consumer无法获取服务消息。此问题在linux系统上实验时又无法复现，因为linux和windows的接口对待是否回环是不同的，linux下的consumer可以在provider之先获取到单播消息。\n\n并给出了解决方法：  \n\n1、禁用虚拟网卡。2、在两台机器上分别部署3、采用其它registry4、将服务提供者的spring配置文件中改为(注意url后面的参数配置)&lt;dubbo:registry address=&quot;multicast://224.5.6.7:1234?unicast=false&quot;/&gt;\n\n但是1、2、4在分别试过后都没用，最后我选择使用zookeeper来解决，也就是3中的方法，最后总算成功。但是dubbo首页给的方法真的很坑，muticast居然会报错，虽然根本原因可能是由windows系统引起的，以后需要仔细了解下多播，看看到底是怎么回事。\n","dateCreated":"2018-06-13T16:08:37+08:00","dateModified":"2018-06-16T12:49:24+08:00","datePublished":"2018-06-13T16:08:37+08:00","description":"","headline":"初次使用dubbo框架遇见的坑","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/"},"publisher":{"@type":"Organization","name":"GRXself","sameAs":[],"image":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg","logo":{"@type":"ImageObject","url":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg"}},"url":"https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/","keywords":"坑, dubbo, 分布式系统, 入门"}</script>
-    <meta name="description" content="按照dubbo首页的quick start入门，provider可以正常启动，但是consumer一直报错。按照Demo写的代码运行Cunsummer时 Failed to check the status of the service com.alibaba.dubbo.demo.DemoService,找到了一个貌">
-<meta name="keywords" content="坑,dubbo,分布式系统,入门">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"GRXself","sameAs":[],"image":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg"},"articleBody":"在遇到我之前写的这篇文章(使用zip4j遇到的CRC错误（invalid CRC for file）———“_”字符造成的异常)的问题之后，又遇到了其他字符出错的问题，这次我发现了这个项目中问题的根源。\n此项目中接收并读取压缩包的电脑光驱存在问题，导致其在读取某些光盘是会出现乱码（文件系统的名字已经出现异常，本来是普通的中文名称，变成了类似于__DS332S0这样的名称，不管是文件夹还是里面的文件都是如此）此乱码造成的影响不只局限于名称，读取的文件也受到了影响。在正常的光驱中读取的数据无论是名称还是内容均正常，而此问题光驱最终导致了异常的发生。\n最终的解决方案就是不再使用此光驱读取光盘中的数据，借用其他光驱读取后利用其他移动存储介质转移到此电脑后再使用。\n","dateCreated":"2019-05-14T19:08:25+08:00","dateModified":"2019-05-14T19:32:59+08:00","datePublished":"2019-05-14T19:08:25+08:00","description":"","headline":"光驱异常导致的数据读取异常","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://grxself.github.io/2019/05/14/光驱异常导致的数据读取异常/"},"publisher":{"@type":"Organization","name":"GRXself","sameAs":[],"image":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg","logo":{"@type":"ImageObject","url":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg"}},"url":"https://grxself.github.io/2019/05/14/光驱异常导致的数据读取异常/","keywords":"坑, 光驱, 硬件"}</script>
+    <meta name="description" content="在遇到我之前写的这篇文章(使用zip4j遇到的CRC错误（invalid CRC for file）———“_”字符造成的异常)的问题之后，又遇到了其他字符出错的问题，这次我发现了这个项目中问题的根源。 此项目中接收并读取压缩包的电脑光驱存在问题，导致其在读取某些光盘是会出现乱码（文件系统的名字已经出现异常，本来是普通">
+<meta name="keywords" content="坑,光驱,硬件">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="初次使用dubbo框架遇见的坑">
-<meta property="og:url" content="https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/index.html">
+<meta property="og:title" content="光驱异常导致的数据读取异常">
+<meta property="og:url" content="https://grxself.github.io/2019/05/14/光驱异常导致的数据读取异常/index.html">
 <meta property="og:site_name" content="GRXself&#39;s blog">
-<meta property="og:description" content="按照dubbo首页的quick start入门，provider可以正常启动，但是consumer一直报错。按照Demo写的代码运行Cunsummer时 Failed to check the status of the service com.alibaba.dubbo.demo.DemoService,找到了一个貌似指出问题的blog，里面提到  根本原因是源码中会判断发送给consumer的">
+<meta property="og:description" content="在遇到我之前写的这篇文章(使用zip4j遇到的CRC错误（invalid CRC for file）———“_”字符造成的异常)的问题之后，又遇到了其他字符出错的问题，这次我发现了这个项目中问题的根源。 此项目中接收并读取压缩包的电脑光驱存在问题，导致其在读取某些光盘是会出现乱码（文件系统的名字已经出现异常，本来是普通的中文名称，变成了类似于__DS332S0这样的名称，不管是文件夹还是里面的文件">
 <meta property="og:locale" content="zh-cn">
-<meta property="og:updated_time" content="2018-06-16T04:49:24.540Z">
+<meta property="og:updated_time" content="2019-05-14T11:32:59.326Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="初次使用dubbo框架遇见的坑">
-<meta name="twitter:description" content="按照dubbo首页的quick start入门，provider可以正常启动，但是consumer一直报错。按照Demo写的代码运行Cunsummer时 Failed to check the status of the service com.alibaba.dubbo.demo.DemoService,找到了一个貌似指出问题的blog，里面提到  根本原因是源码中会判断发送给consumer的">
+<meta name="twitter:title" content="光驱异常导致的数据读取异常">
+<meta name="twitter:description" content="在遇到我之前写的这篇文章(使用zip4j遇到的CRC错误（invalid CRC for file）———“_”字符造成的异常)的问题之后，又遇到了其他字符出错的问题，这次我发现了这个项目中问题的根源。 此项目中接收并读取压缩包的电脑光驱存在问题，导致其在读取某些光盘是会出现乱码（文件系统的名字已经出现异常，本来是普通的中文名称，变成了类似于__DS332S0这样的名称，不管是文件夹还是里面的文件">
 <meta name="twitter:creator" content="@GRXself">
     
     
@@ -211,20 +211,20 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            初次使用dubbo框架遇见的坑
+            光驱异常导致的数据读取异常
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2018-06-13T16:08:37+08:00">
+    <time datetime="2019-05-14T19:08:25+08:00">
 	
-		    6月 13, 2018
+		    5月 14, 2019
     	
     </time>
     
         <span>发布在 </span>
         
-    <a class="category-link" href="/categories/分布式系统/">分布式系统</a>
+    <a class="category-link" href="/categories/硬件/">硬件</a>
 
 
     
@@ -236,15 +236,9 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>按照dubbo首页的quick start入门，provider可以正常启动，但是consumer一直报错。<br>按照Demo写的代码运行Cunsummer时 <code>Failed to check the status of the service com.alibaba.dubbo.demo.DemoService</code>,找到了一个貌似指出问题的<a href="https://www.jianshu.com/p/3646263199a1" target="_blank" rel="noopener">blog</a>，里面提到</p>
-<blockquote>
-<p>根本原因是源码中会判断发送给consumer的服务消息是采用单播还是组播，因为虚拟网卡对ip地址的影响导致判断逻辑出错，误认为consumer可以接收到单播，但其实consumer在收到单播消息之前provider自己就把这个消息给抢着处理了（因为provider和consumer在同一台机器上，相当于provider自发自收），导致consumer无法获取服务消息。此问题在linux系统上实验时又无法复现，因为linux和windows的接口对待是否回环是不同的，linux下的consumer可以在provider之先获取到单播消息。</p>
-</blockquote>
-<p>并给出了解决方法：  </p>
-<blockquote>
-<p>1、禁用虚拟网卡。<br>2、在两台机器上分别部署<br>3、采用其它registry<br>4、将服务提供者的spring配置文件中改为(注意url后面的参数配置)<br><code>&lt;dubbo:registry address=&quot;multicast://224.5.6.7:1234?unicast=false&quot;/&gt;</code></p>
-</blockquote>
-<p>但是<strong>1、2、4在分别试过后都没用</strong>，最后我选择使用zookeeper来解决，也就是3中的方法，最后总算成功。但是dubbo首页给的方法真的很坑，muticast居然会报错，虽然根本原因<strong>可能是由windows系统引起的</strong>，以后需要仔细了解下多播，看看到底是怎么回事。</p>
+            <p>在遇到我之前写的这篇文章(<a href="https://grxself.github.io/2018/11/24/%E4%BD%BF%E7%94%A8zip4j%E9%81%87%E5%88%B0%E7%9A%84CRC%E9%94%99%E8%AF%AF%EF%BC%88invalid%20CRC%20for%20file%EF%BC%89%E2%80%94%E2%80%94%E2%80%94_%E5%AD%97%E7%AC%A6%E9%80%A0%E6%88%90%E7%9A%84%E5%BC%82%E5%B8%B8/">使用zip4j遇到的CRC错误（invalid CRC for file）———“_”字符造成的异常</a>)的问题之后，又遇到了其他字符出错的问题，这次我发现了这个项目中问题的根源。</p>
+<p>此项目中接收并读取压缩包的电脑光驱存在问题，导致其在读取某些光盘是会出现乱码（文件系统的名字已经出现异常，本来是普通的中文名称，变成了类似于<code>__DS332S0</code>这样的名称，不管是文件夹还是里面的文件都是如此）此乱码造成的影响不只局限于名称，读取的文件也受到了影响。在正常的光驱中读取的数据无论是名称还是内容均正常，而此问题光驱最终导致了异常的发生。</p>
+<p>最终的解决方案就是不再使用此光驱读取光盘中的数据，借用其他光驱读取后利用其他移动存储介质转移到此电脑后再使用。</p>
 
             
 
@@ -255,7 +249,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">标签</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="/tags/dubbo/">dubbo</a> <a class="tag tag--primary tag--small t-link" href="/tags/入门/">入门</a> <a class="tag tag--primary tag--small t-link" href="/tags/分布式系统/">分布式系统</a> <a class="tag tag--primary tag--small t-link" href="/tags/坑/">坑</a>
+    <a class="tag tag--primary tag--small t-link" href="/tags/光驱/">光驱</a> <a class="tag tag--primary tag--small t-link" href="/tags/坑/">坑</a> <a class="tag tag--primary tag--small t-link" href="/tags/硬件/">硬件</a>
 
             </div>
         
@@ -265,8 +259,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/11/24/使用zip4j遇到的CRC错误（invalid CRC for file）———_字符造成的异常/" data-tooltip="使用zip4j遇到的CRC错误（invalid CRC for file）———&#34;_&#34;字符造成的异常" aria-label="上一篇: 使用zip4j遇到的CRC错误（invalid CRC for file）———&#34;_&#34;字符造成的异常">
+                    <a class="post-action-btn btn btn--disabled">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
@@ -274,7 +267,8 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/05/14/Java Overflow and Underflow/" data-tooltip="Java Overflow and Underflow" aria-label="下一篇: Java Overflow and Underflow">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -292,7 +286,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/" title="分享到 Facebook">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://grxself.github.io/2019/05/14/光驱异常导致的数据读取异常/" title="分享到 Facebook">
                     <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
@@ -300,7 +294,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/" title="分享到 Twitter">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://grxself.github.io/2019/05/14/光驱异常导致的数据读取异常/" title="分享到 Twitter">
                     <i class="fa fa-twitter" aria-hidden="true"></i>
                 </a>
             </li>
@@ -308,7 +302,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/" title="分享到 Google+">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://grxself.github.io/2019/05/14/光驱异常导致的数据读取异常/" title="分享到 Google+">
                     <i class="fa fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
@@ -316,7 +310,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/" title="分享到 Weibo">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://grxself.github.io/2019/05/14/光驱异常导致的数据读取异常/" title="分享到 Weibo">
                     <i class="fa fa-weibo" aria-hidden="true"></i>
                 </a>
             </li>
@@ -358,8 +352,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/11/24/使用zip4j遇到的CRC错误（invalid CRC for file）———_字符造成的异常/" data-tooltip="使用zip4j遇到的CRC错误（invalid CRC for file）———&#34;_&#34;字符造成的异常" aria-label="上一篇: 使用zip4j遇到的CRC错误（invalid CRC for file）———&#34;_&#34;字符造成的异常">
+                    <a class="post-action-btn btn btn--disabled">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
@@ -367,7 +360,8 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/05/14/Java Overflow and Underflow/" data-tooltip="Java Overflow and Underflow" aria-label="下一篇: Java Overflow and Underflow">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -385,7 +379,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/" title="分享到 Facebook">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://grxself.github.io/2019/05/14/光驱异常导致的数据读取异常/" title="分享到 Facebook">
                     <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
@@ -393,7 +387,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/" title="分享到 Twitter">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://grxself.github.io/2019/05/14/光驱异常导致的数据读取异常/" title="分享到 Twitter">
                     <i class="fa fa-twitter" aria-hidden="true"></i>
                 </a>
             </li>
@@ -401,7 +395,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/" title="分享到 Google+">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://grxself.github.io/2019/05/14/光驱异常导致的数据读取异常/" title="分享到 Google+">
                     <i class="fa fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
@@ -409,7 +403,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/" title="分享到 Weibo">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://grxself.github.io/2019/05/14/光驱异常导致的数据读取异常/" title="分享到 Weibo">
                     <i class="fa fa-weibo" aria-hidden="true"></i>
                 </a>
             </li>
@@ -436,7 +430,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://grxself.github.io/2019/05/14/光驱异常导致的数据读取异常/">
                     <i class="fa fa-facebook-official" aria-hidden="true"></i><span>分享到 Facebook</span>
                 </a>
             </li>
@@ -444,7 +438,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://grxself.github.io/2019/05/14/光驱异常导致的数据读取异常/">
                     <i class="fa fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
                 </a>
             </li>
@@ -452,7 +446,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/">
+                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://grxself.github.io/2019/05/14/光驱异常导致的数据读取异常/">
                     <i class="fa fa-google-plus" aria-hidden="true"></i><span>分享到 Google+</span>
                 </a>
             </li>
@@ -460,7 +454,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/">
+                <a class="share-option-btn" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://grxself.github.io/2019/05/14/光驱异常导致的数据读取异常/">
                     <i class="fa fa-weibo" aria-hidden="true"></i><span>分享到 Weibo</span>
                 </a>
             </li>

@@ -6,16 +6,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="GRXself&#39;s blog">
-    <title>GRXself&#39;s blog</title>
+    <title>分类: java - GRXself&#39;s blog</title>
     <meta name="author" content="GRXself">
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"Website","@id":"https://grxself.github.io","author":{"@type":"Person","name":"GRXself","sameAs":[],"image":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg"},"name":"GRXself's blog","description":"personal blog","url":"https://grxself.github.io"}</script>
+    <script type="application/ld+json">{}</script>
     <meta name="description" content="personal blog">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="GRXself&#39;s blog">
-<meta property="og:url" content="https://grxself.github.io/index.html">
+<meta property="og:url" content="https://grxself.github.io/categories/java/index.html">
 <meta property="og:site_name" content="GRXself&#39;s blog">
 <meta property="og:description" content="personal blog">
 <meta property="og:locale" content="zh-cn">
@@ -202,58 +202,8 @@
                  class="
                         hasCoverMetaIn
                         ">
-                <section class="postShorten-group main-content-wrap">
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="/2019/05/14/光驱异常导致的数据读取异常/">
-                            光驱异常导致的数据读取异常
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2019-05-14T19:08:25+08:00">
-	
-		    5月 14, 2019
-    	
-    </time>
-    
-        <span>发布在 </span>
-        
-    <a class="category-link" href="/categories/硬件/">硬件</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-content">
-                    <p>在遇到我之前写的这篇文章(<a href="https://grxself.github.io/2018/11/24/%E4%BD%BF%E7%94%A8zip4j%E9%81%87%E5%88%B0%E7%9A%84CRC%E9%94%99%E8%AF%AF%EF%BC%88invalid%20CRC%20for%20file%EF%BC%89%E2%80%94%E2%80%94%E2%80%94_%E5%AD%97%E7%AC%A6%E9%80%A0%E6%88%90%E7%9A%84%E5%BC%82%E5%B8%B8/">使用zip4j遇到的CRC错误（invalid CRC for file）———“_”字符造成的异常</a>)的问题之后，又遇到了其他字符出错的问题，这次我发现了这个项目中问题的根源。</p>
-<p>此项目中接收并读取压缩包的电脑光驱存在问题，导致其在读取某些光盘是会出现乱码（文件系统的名字已经出现异常，本来是普通的中文名称，变成了类似于<code>__DS332S0</code>这样的名称，不管是文件夹还是里面的文件都是如此）此乱码造成的影响不只局限于名称，读取的文件也受到了影响。在正常的光驱中读取的数据无论是名称还是内容均正常，而此问题光驱最终导致了异常的发生。</p>
-<p>最终的解决方案就是不再使用此光驱读取光盘中的数据，借用其他光驱读取后利用其他移动存储介质转移到此电脑后再使用。</p>
-
-                    
-                        
-
-                    
-                    
-                        <p>
-                            <a href="/2019/05/14/光驱异常导致的数据读取异常/#post-footer" class="postShorten-excerpt_link link">
-                                评论和共享
-                            </a>
-                        </p>
-                    
-                </div>
-            
-        </div>
-        
-    </article>
+                
+    <section class="postShorten-group main-content-wrap">
     
     
     <article class="postShorten postShorten--thumbnailimg-bottom">
@@ -309,122 +259,6 @@
         
     </article>
     
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="/2018/11/24/使用zip4j遇到的CRC错误（invalid CRC for file）———_字符造成的异常/">
-                            使用zip4j遇到的CRC错误（invalid CRC for file）———&#34;_&#34;字符造成的异常
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2018-11-24T21:56:00+08:00">
-	
-		    11月 24, 2018
-    	
-    </time>
-    
-        <span>发布在 </span>
-        
-    <a class="category-link" href="/categories/解压工具/">解压工具</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-content">
-                    <p>今天遇到了一个棘手的解压问题，先描述一下大致的业务情况。压缩包是自己写的C#程序生成的（有加密），使用的是ICSharpCode.SharpZipLib，然后C#程序也可以解压这个加密的压缩包。这个加密的压缩包最终会上传到javaweb服务器上（springboot+tomcat+MySQL），javaweb项目使用的是zip4j。</p>
-<p>结果客户提交上来的用C#程序生成的压缩包，无论是在C#程序上还是在java程序上都不能顺利解压（总共有200多文件夹，包含文件，但是解压到二十多个文件夹的时候出了问题）。</p>
-<p>我尝试使用7Zip这个软件直接解压压缩包，发现压缩包可以正常解压，也不会报错。</p>
-<p>在这之后我又使用我的C#程序对7Zip解压出来的文件重新进行压缩，然后发现我重新生成的文件在C#和java两边都能够正常解压。</p>
-<p>难道是客户提交的压缩包有问题？但是7Zip解压的时候没有任何报错啊！</p>
-<p>于是我开始在java程序那边打了断点进行调试，异常是：<code>net.lingala.zip4j.exception.ZipException: net.lingala.zip4j.exception.ZipException: invalid CRC for file: XXXX(此处省略文件名）</code></p>
-<p>然后我在zip4j找到了两个讨论CRC问题的贴子<a href="http://www.lingala.net/zip4j/forum/index.php?topic=365.0" target="_blank" rel="noopener">#贴子1</a>、  <a href="http://www.lingala.net/zip4j/forum/index.php?topic=332.0" target="_blank" rel="noopener">#贴子2</a>，发现zip4j最新版本（1.3.2）确实存在CRC的bug。</p>
-<p>但是奇怪的是C#版本为什么也会有类似的问题？于是我用7Zip的file manager查看了用户提交的压缩包（存在异常）和我自己重新生成的压缩包（一切正常），在仔细对比之后发现异常压缩包停止解压的文件名包含<code>_</code>，用file manager查看发现异常的压缩包文件名中的<code>_</code>显示为<code>?</code>，而正常的压缩包则正常显示<code>_</code>。</p>
-<p>由于客户那边周末休假，所以无法得知客户对压缩包做过什么，也暂时无法获取用户的系统情况，但是我猜测可能是由于客户系统编码的原因导致<code>_</code>字符出现了异常，所以目前的解决方案是禁止客户在命名的时候使用<code>_</code>。</p>
-<hr>
-<p>2019-05-14更新：<br>此问题根源与zip4j无关，如需了解造成文中问题的根源请移步另一篇文章<a href="https://grxself.github.io/2019/05/14/光驱异常导致的数据读取异常/">光驱异常导致的数据读取异常</a></p>
-
-                    
-                        
-
-                    
-                    
-                        <p>
-                            <a href="/2018/11/24/使用zip4j遇到的CRC错误（invalid CRC for file）———_字符造成的异常/#post-footer" class="postShorten-excerpt_link link">
-                                评论和共享
-                            </a>
-                        </p>
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="/2018/06/13/初次使用dubbo框架遇见的坑/">
-                            初次使用dubbo框架遇见的坑
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2018-06-13T16:08:37+08:00">
-	
-		    6月 13, 2018
-    	
-    </time>
-    
-        <span>发布在 </span>
-        
-    <a class="category-link" href="/categories/分布式系统/">分布式系统</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-content">
-                    <p>按照dubbo首页的quick start入门，provider可以正常启动，但是consumer一直报错。<br>按照Demo写的代码运行Cunsummer时 <code>Failed to check the status of the service com.alibaba.dubbo.demo.DemoService</code>,找到了一个貌似指出问题的<a href="https://www.jianshu.com/p/3646263199a1" target="_blank" rel="noopener">blog</a>，里面提到</p>
-<blockquote>
-<p>根本原因是源码中会判断发送给consumer的服务消息是采用单播还是组播，因为虚拟网卡对ip地址的影响导致判断逻辑出错，误认为consumer可以接收到单播，但其实consumer在收到单播消息之前provider自己就把这个消息给抢着处理了（因为provider和consumer在同一台机器上，相当于provider自发自收），导致consumer无法获取服务消息。此问题在linux系统上实验时又无法复现，因为linux和windows的接口对待是否回环是不同的，linux下的consumer可以在provider之先获取到单播消息。</p>
-</blockquote>
-<p>并给出了解决方法：  </p>
-<blockquote>
-<p>1、禁用虚拟网卡。<br>2、在两台机器上分别部署<br>3、采用其它registry<br>4、将服务提供者的spring配置文件中改为(注意url后面的参数配置)<br><code>&lt;dubbo:registry address=&quot;multicast://224.5.6.7:1234?unicast=false&quot;/&gt;</code></p>
-</blockquote>
-<p>但是<strong>1、2、4在分别试过后都没用</strong>，最后我选择使用zookeeper来解决，也就是3中的方法，最后总算成功。但是dubbo首页给的方法真的很坑，muticast居然会报错，虽然根本原因<strong>可能是由windows系统引起的</strong>，以后需要仔细了解下多播，看看到底是怎么回事。</p>
-
-                    
-                        
-
-                    
-                    
-                        <p>
-                            <a href="/2018/06/13/初次使用dubbo框架遇见的坑/#post-footer" class="postShorten-excerpt_link link">
-                                评论和共享
-                            </a>
-                        </p>
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
     <div class="pagination-bar">
     <ul class="pagination">
         
@@ -434,6 +268,7 @@
 </div>
 
 </section>
+
 
 
                 <footer id="footer" class="main-content-wrap">

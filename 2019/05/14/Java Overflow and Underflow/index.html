@@ -6,24 +6,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="GRXself&#39;s blog">
-    <title>初次使用dubbo框架遇见的坑 - GRXself&#39;s blog</title>
+    <title>Java Overflow and Underflow - GRXself&#39;s blog</title>
     <meta name="author" content="GRXself">
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"GRXself","sameAs":[],"image":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg"},"articleBody":"按照dubbo首页的quick start入门，provider可以正常启动，但是consumer一直报错。按照Demo写的代码运行Cunsummer时 Failed to check the status of the service com.alibaba.dubbo.demo.DemoService,找到了一个貌似指出问题的blog，里面提到\n\n根本原因是源码中会判断发送给consumer的服务消息是采用单播还是组播，因为虚拟网卡对ip地址的影响导致判断逻辑出错，误认为consumer可以接收到单播，但其实consumer在收到单播消息之前provider自己就把这个消息给抢着处理了（因为provider和consumer在同一台机器上，相当于provider自发自收），导致consumer无法获取服务消息。此问题在linux系统上实验时又无法复现，因为linux和windows的接口对待是否回环是不同的，linux下的consumer可以在provider之先获取到单播消息。\n\n并给出了解决方法：  \n\n1、禁用虚拟网卡。2、在两台机器上分别部署3、采用其它registry4、将服务提供者的spring配置文件中改为(注意url后面的参数配置)&lt;dubbo:registry address=&quot;multicast://224.5.6.7:1234?unicast=false&quot;/&gt;\n\n但是1、2、4在分别试过后都没用，最后我选择使用zookeeper来解决，也就是3中的方法，最后总算成功。但是dubbo首页给的方法真的很坑，muticast居然会报错，虽然根本原因可能是由windows系统引起的，以后需要仔细了解下多播，看看到底是怎么回事。\n","dateCreated":"2018-06-13T16:08:37+08:00","dateModified":"2018-06-16T12:49:24+08:00","datePublished":"2018-06-13T16:08:37+08:00","description":"","headline":"初次使用dubbo框架遇见的坑","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/"},"publisher":{"@type":"Organization","name":"GRXself","sameAs":[],"image":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg","logo":{"@type":"ImageObject","url":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg"}},"url":"https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/","keywords":"坑, dubbo, 分布式系统, 入门"}</script>
-    <meta name="description" content="按照dubbo首页的quick start入门，provider可以正常启动，但是consumer一直报错。按照Demo写的代码运行Cunsummer时 Failed to check the status of the service com.alibaba.dubbo.demo.DemoService,找到了一个貌">
-<meta name="keywords" content="坑,dubbo,分布式系统,入门">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"GRXself","sameAs":[],"image":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg"},"articleBody":"今天在leetcode上做练习的时候遇到了一个回文数的题，考虑到不将整数转换为字符串来解决这个问题，我用求余把原整数倒序，然后跟原整数进行比较。\n虽然我的做法通过了测试用例，也提交成功了，但是在我看官方题解时发现题解中考虑了直接倒序可能会出现临界情况，倒序的数可能会超过int的范围。官方题解中是只倒序了一半数字，然后对一半进行比较，所以没有涉及遇到边界的计算，但是我自己的solution涉及到了边界。\n这里最大的问题是，我虽然没有考虑边界，但是却通过了测试。我开始以为是用例中没有包含边界，于是自己对边界进行了测试，但是实际测试之后才发现遇到边界之后java并没有抛出任何异常。\n我对边界情况进行了调试，发现当一个边界内的数在数学运算之后超过边界后，其结果是可以预测的，但是却没有任何异常，也不是真正的数学运算结果。我在google和so上查找一番之后发现这种情况是数学运算之后，只有后32位的二进制数得到了保留。\n在进一步的搜索之后，我找到了这篇文章,里面提到了Java Overflow And Underflow，而我遇见的情况就是overflow。\nJava本身（我使用的是Java8）对这种overflow并没有任何runtime exception，所以这个问题只能靠自己去发现，需要保持警惕。\n","dateCreated":"2019-05-14T18:03:00+08:00","dateModified":"2019-05-14T18:52:23+08:00","datePublished":"2019-05-14T18:03:00+08:00","description":"","headline":"Java Overflow and Underflow","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://grxself.github.io/2019/05/14/Java Overflow and Underflow/"},"publisher":{"@type":"Organization","name":"GRXself","sameAs":[],"image":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg","logo":{"@type":"ImageObject","url":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg"}},"url":"https://grxself.github.io/2019/05/14/Java Overflow and Underflow/","keywords":"java, overflow, underflow, 坑"}</script>
+    <meta name="description" content="今天在leetcode上做练习的时候遇到了一个回文数的题，考虑到不将整数转换为字符串来解决这个问题，我用求余把原整数倒序，然后跟原整数进行比较。 虽然我的做法通过了测试用例，也提交成功了，但是在我看官方题解时发现题解中考虑了直接倒序可能会出现临界情况，倒序的数可能会超过int的范围。官方题解中是只倒序了一半数字，然后对">
+<meta name="keywords" content="java,overflow,underflow,坑">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="初次使用dubbo框架遇见的坑">
-<meta property="og:url" content="https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/index.html">
+<meta property="og:title" content="Java Overflow and Underflow">
+<meta property="og:url" content="https://grxself.github.io/2019/05/14/Java Overflow and Underflow/index.html">
 <meta property="og:site_name" content="GRXself&#39;s blog">
-<meta property="og:description" content="按照dubbo首页的quick start入门，provider可以正常启动，但是consumer一直报错。按照Demo写的代码运行Cunsummer时 Failed to check the status of the service com.alibaba.dubbo.demo.DemoService,找到了一个貌似指出问题的blog，里面提到  根本原因是源码中会判断发送给consumer的">
+<meta property="og:description" content="今天在leetcode上做练习的时候遇到了一个回文数的题，考虑到不将整数转换为字符串来解决这个问题，我用求余把原整数倒序，然后跟原整数进行比较。 虽然我的做法通过了测试用例，也提交成功了，但是在我看官方题解时发现题解中考虑了直接倒序可能会出现临界情况，倒序的数可能会超过int的范围。官方题解中是只倒序了一半数字，然后对一半进行比较，所以没有涉及遇到边界的计算，但是我自己的solution涉及到了边">
 <meta property="og:locale" content="zh-cn">
-<meta property="og:updated_time" content="2018-06-16T04:49:24.540Z">
+<meta property="og:updated_time" content="2019-05-14T10:52:23.154Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="初次使用dubbo框架遇见的坑">
-<meta name="twitter:description" content="按照dubbo首页的quick start入门，provider可以正常启动，但是consumer一直报错。按照Demo写的代码运行Cunsummer时 Failed to check the status of the service com.alibaba.dubbo.demo.DemoService,找到了一个貌似指出问题的blog，里面提到  根本原因是源码中会判断发送给consumer的">
+<meta name="twitter:title" content="Java Overflow and Underflow">
+<meta name="twitter:description" content="今天在leetcode上做练习的时候遇到了一个回文数的题，考虑到不将整数转换为字符串来解决这个问题，我用求余把原整数倒序，然后跟原整数进行比较。 虽然我的做法通过了测试用例，也提交成功了，但是在我看官方题解时发现题解中考虑了直接倒序可能会出现临界情况，倒序的数可能会超过int的范围。官方题解中是只倒序了一半数字，然后对一半进行比较，所以没有涉及遇到边界的计算，但是我自己的solution涉及到了边">
 <meta name="twitter:creator" content="@GRXself">
     
     
@@ -211,20 +211,20 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            初次使用dubbo框架遇见的坑
+            Java Overflow and Underflow
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2018-06-13T16:08:37+08:00">
+    <time datetime="2019-05-14T18:03:00+08:00">
 	
-		    6月 13, 2018
+		    5月 14, 2019
     	
     </time>
     
         <span>发布在 </span>
         
-    <a class="category-link" href="/categories/分布式系统/">分布式系统</a>
+    <a class="category-link" href="/categories/java/">java</a>
 
 
     
@@ -236,15 +236,12 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>按照dubbo首页的quick start入门，provider可以正常启动，但是consumer一直报错。<br>按照Demo写的代码运行Cunsummer时 <code>Failed to check the status of the service com.alibaba.dubbo.demo.DemoService</code>,找到了一个貌似指出问题的<a href="https://www.jianshu.com/p/3646263199a1" target="_blank" rel="noopener">blog</a>，里面提到</p>
-<blockquote>
-<p>根本原因是源码中会判断发送给consumer的服务消息是采用单播还是组播，因为虚拟网卡对ip地址的影响导致判断逻辑出错，误认为consumer可以接收到单播，但其实consumer在收到单播消息之前provider自己就把这个消息给抢着处理了（因为provider和consumer在同一台机器上，相当于provider自发自收），导致consumer无法获取服务消息。此问题在linux系统上实验时又无法复现，因为linux和windows的接口对待是否回环是不同的，linux下的consumer可以在provider之先获取到单播消息。</p>
-</blockquote>
-<p>并给出了解决方法：  </p>
-<blockquote>
-<p>1、禁用虚拟网卡。<br>2、在两台机器上分别部署<br>3、采用其它registry<br>4、将服务提供者的spring配置文件中改为(注意url后面的参数配置)<br><code>&lt;dubbo:registry address=&quot;multicast://224.5.6.7:1234?unicast=false&quot;/&gt;</code></p>
-</blockquote>
-<p>但是<strong>1、2、4在分别试过后都没用</strong>，最后我选择使用zookeeper来解决，也就是3中的方法，最后总算成功。但是dubbo首页给的方法真的很坑，muticast居然会报错，虽然根本原因<strong>可能是由windows系统引起的</strong>，以后需要仔细了解下多播，看看到底是怎么回事。</p>
+            <p>今天在leetcode上做练习的时候遇到了一个<a href="https://leetcode-cn.com/problems/palindrome-number/solution/hui-wen-shu-by-leetcode/" target="_blank" rel="noopener">回文数的题</a>，考虑到不将整数转换为字符串来解决这个问题，我用求余把原整数倒序，然后跟原整数进行比较。</p>
+<p>虽然我的做法通过了测试用例，也提交成功了，但是在我看官方题解时发现题解中考虑了直接倒序可能会出现临界情况，倒序的数可能会超过int的范围。官方题解中是只倒序了一半数字，然后对一半进行比较，所以没有涉及遇到边界的计算，但是我自己的solution涉及到了边界。</p>
+<p>这里最大的问题是，我虽然没有考虑边界，但是却通过了测试。我开始以为是用例中没有包含边界，于是自己对边界进行了测试，但是实际测试之后才发现遇到边界之后java并没有抛出任何异常。</p>
+<p>我对边界情况进行了调试，发现当一个边界内的数在数学运算之后超过边界后，其结果是可以预测的，但是却没有任何异常，也不是真正的数学运算结果。我在google和so上查找一番之后发现这种情况是数学运算之后，只有后32位的二进制数得到了保留。</p>
+<p>在进一步的搜索之后，我找到了<a href="https://javapapers.com/core-java/java-overflow-and-underflow/" target="_blank" rel="noopener">这篇文章</a>,里面提到了Java Overflow And Underflow，而我遇见的情况就是overflow。</p>
+<p>Java本身（我使用的是Java8）对这种overflow并没有任何runtime exception，所以这个问题只能靠自己去发现，需要保持警惕。</p>
 
             
 
@@ -255,7 +252,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">标签</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="/tags/dubbo/">dubbo</a> <a class="tag tag--primary tag--small t-link" href="/tags/入门/">入门</a> <a class="tag tag--primary tag--small t-link" href="/tags/分布式系统/">分布式系统</a> <a class="tag tag--primary tag--small t-link" href="/tags/坑/">坑</a>
+    <a class="tag tag--primary tag--small t-link" href="/tags/java/">java</a> <a class="tag tag--primary tag--small t-link" href="/tags/overflow/">overflow</a> <a class="tag tag--primary tag--small t-link" href="/tags/underflow/">underflow</a> <a class="tag tag--primary tag--small t-link" href="/tags/坑/">坑</a>
 
             </div>
         
@@ -266,7 +263,7 @@
             <li class="post-action">
                 
                     
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/11/24/使用zip4j遇到的CRC错误（invalid CRC for file）———_字符造成的异常/" data-tooltip="使用zip4j遇到的CRC错误（invalid CRC for file）———&#34;_&#34;字符造成的异常" aria-label="上一篇: 使用zip4j遇到的CRC错误（invalid CRC for file）———&#34;_&#34;字符造成的异常">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/05/14/光驱异常导致的数据读取异常/" data-tooltip="光驱异常导致的数据读取异常" aria-label="上一篇: 光驱异常导致的数据读取异常">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
@@ -274,7 +271,8 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/11/24/使用zip4j遇到的CRC错误（invalid CRC for file）———_字符造成的异常/" data-tooltip="使用zip4j遇到的CRC错误（invalid CRC for file）———&#34;_&#34;字符造成的异常" aria-label="下一篇: 使用zip4j遇到的CRC错误（invalid CRC for file）———&#34;_&#34;字符造成的异常">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -292,7 +290,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/" title="分享到 Facebook">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://grxself.github.io/2019/05/14/Java Overflow and Underflow/" title="分享到 Facebook">
                     <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
@@ -300,7 +298,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/" title="分享到 Twitter">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://grxself.github.io/2019/05/14/Java Overflow and Underflow/" title="分享到 Twitter">
                     <i class="fa fa-twitter" aria-hidden="true"></i>
                 </a>
             </li>
@@ -308,7 +306,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/" title="分享到 Google+">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://grxself.github.io/2019/05/14/Java Overflow and Underflow/" title="分享到 Google+">
                     <i class="fa fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
@@ -316,7 +314,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/" title="分享到 Weibo">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://grxself.github.io/2019/05/14/Java Overflow and Underflow/" title="分享到 Weibo">
                     <i class="fa fa-weibo" aria-hidden="true"></i>
                 </a>
             </li>
@@ -359,7 +357,7 @@
             <li class="post-action">
                 
                     
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/11/24/使用zip4j遇到的CRC错误（invalid CRC for file）———_字符造成的异常/" data-tooltip="使用zip4j遇到的CRC错误（invalid CRC for file）———&#34;_&#34;字符造成的异常" aria-label="上一篇: 使用zip4j遇到的CRC错误（invalid CRC for file）———&#34;_&#34;字符造成的异常">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/05/14/光驱异常导致的数据读取异常/" data-tooltip="光驱异常导致的数据读取异常" aria-label="上一篇: 光驱异常导致的数据读取异常">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
@@ -367,7 +365,8 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/11/24/使用zip4j遇到的CRC错误（invalid CRC for file）———_字符造成的异常/" data-tooltip="使用zip4j遇到的CRC错误（invalid CRC for file）———&#34;_&#34;字符造成的异常" aria-label="下一篇: 使用zip4j遇到的CRC错误（invalid CRC for file）———&#34;_&#34;字符造成的异常">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -385,7 +384,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/" title="分享到 Facebook">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://grxself.github.io/2019/05/14/Java Overflow and Underflow/" title="分享到 Facebook">
                     <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
@@ -393,7 +392,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/" title="分享到 Twitter">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://grxself.github.io/2019/05/14/Java Overflow and Underflow/" title="分享到 Twitter">
                     <i class="fa fa-twitter" aria-hidden="true"></i>
                 </a>
             </li>
@@ -401,7 +400,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/" title="分享到 Google+">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://grxself.github.io/2019/05/14/Java Overflow and Underflow/" title="分享到 Google+">
                     <i class="fa fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
@@ -409,7 +408,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/" title="分享到 Weibo">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://grxself.github.io/2019/05/14/Java Overflow and Underflow/" title="分享到 Weibo">
                     <i class="fa fa-weibo" aria-hidden="true"></i>
                 </a>
             </li>
@@ -436,7 +435,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://grxself.github.io/2019/05/14/Java Overflow and Underflow/">
                     <i class="fa fa-facebook-official" aria-hidden="true"></i><span>分享到 Facebook</span>
                 </a>
             </li>
@@ -444,7 +443,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://grxself.github.io/2019/05/14/Java Overflow and Underflow/">
                     <i class="fa fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
                 </a>
             </li>
@@ -452,7 +451,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/">
+                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://grxself.github.io/2019/05/14/Java Overflow and Underflow/">
                     <i class="fa fa-google-plus" aria-hidden="true"></i><span>分享到 Google+</span>
                 </a>
             </li>
@@ -460,7 +459,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://grxself.github.io/2018/06/13/初次使用dubbo框架遇见的坑/">
+                <a class="share-option-btn" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://grxself.github.io/2019/05/14/Java Overflow and Underflow/">
                     <i class="fa fa-weibo" aria-hidden="true"></i><span>分享到 Weibo</span>
                 </a>
             </li>

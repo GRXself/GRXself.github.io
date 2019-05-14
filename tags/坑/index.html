@@ -212,6 +212,111 @@
             <div class="postShorten-header">
                 <h1 class="postShorten-title">
                     
+                        <a class="link-unstyled" href="/2019/05/14/光驱异常导致的数据读取异常/">
+                            光驱异常导致的数据读取异常
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2019-05-14T19:08:25+08:00">
+	
+		    5月 14, 2019
+    	
+    </time>
+    
+        <span>发布在 </span>
+        
+    <a class="category-link" href="/categories/硬件/">硬件</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-content">
+                    <p>在遇到我之前写的这篇文章(<a href="https://grxself.github.io/2018/11/24/%E4%BD%BF%E7%94%A8zip4j%E9%81%87%E5%88%B0%E7%9A%84CRC%E9%94%99%E8%AF%AF%EF%BC%88invalid%20CRC%20for%20file%EF%BC%89%E2%80%94%E2%80%94%E2%80%94_%E5%AD%97%E7%AC%A6%E9%80%A0%E6%88%90%E7%9A%84%E5%BC%82%E5%B8%B8/">使用zip4j遇到的CRC错误（invalid CRC for file）———“_”字符造成的异常</a>)的问题之后，又遇到了其他字符出错的问题，这次我发现了这个项目中问题的根源。</p>
+<p>此项目中接收并读取压缩包的电脑光驱存在问题，导致其在读取某些光盘是会出现乱码（文件系统的名字已经出现异常，本来是普通的中文名称，变成了类似于<code>__DS332S0</code>这样的名称，不管是文件夹还是里面的文件都是如此）此乱码造成的影响不只局限于名称，读取的文件也受到了影响。在正常的光驱中读取的数据无论是名称还是内容均正常，而此问题光驱最终导致了异常的发生。</p>
+<p>最终的解决方案就是不再使用此光驱读取光盘中的数据，借用其他光驱读取后利用其他移动存储介质转移到此电脑后再使用。</p>
+
+                    
+                        
+
+                    
+                    
+                        <p>
+                            <a href="/2019/05/14/光驱异常导致的数据读取异常/#post-footer" class="postShorten-excerpt_link link">
+                                评论和共享
+                            </a>
+                        </p>
+                    
+                </div>
+            
+        </div>
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a class="link-unstyled" href="/2019/05/14/Java Overflow and Underflow/">
+                            Java Overflow and Underflow
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2019-05-14T18:03:00+08:00">
+	
+		    5月 14, 2019
+    	
+    </time>
+    
+        <span>发布在 </span>
+        
+    <a class="category-link" href="/categories/java/">java</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-content">
+                    <p>今天在leetcode上做练习的时候遇到了一个<a href="https://leetcode-cn.com/problems/palindrome-number/solution/hui-wen-shu-by-leetcode/" target="_blank" rel="noopener">回文数的题</a>，考虑到不将整数转换为字符串来解决这个问题，我用求余把原整数倒序，然后跟原整数进行比较。</p>
+<p>虽然我的做法通过了测试用例，也提交成功了，但是在我看官方题解时发现题解中考虑了直接倒序可能会出现临界情况，倒序的数可能会超过int的范围。官方题解中是只倒序了一半数字，然后对一半进行比较，所以没有涉及遇到边界的计算，但是我自己的solution涉及到了边界。</p>
+<p>这里最大的问题是，我虽然没有考虑边界，但是却通过了测试。我开始以为是用例中没有包含边界，于是自己对边界进行了测试，但是实际测试之后才发现遇到边界之后java并没有抛出任何异常。</p>
+<p>我对边界情况进行了调试，发现当一个边界内的数在数学运算之后超过边界后，其结果是可以预测的，但是却没有任何异常，也不是真正的数学运算结果。我在google和so上查找一番之后发现这种情况是数学运算之后，只有后32位的二进制数得到了保留。</p>
+<p>在进一步的搜索之后，我找到了<a href="https://javapapers.com/core-java/java-overflow-and-underflow/" target="_blank" rel="noopener">这篇文章</a>,里面提到了Java Overflow And Underflow，而我遇见的情况就是overflow。</p>
+<p>Java本身（我使用的是Java8）对这种overflow并没有任何runtime exception，所以这个问题只能靠自己去发现，需要保持警惕。</p>
+
+                    
+                        
+
+                    
+                    
+                        <p>
+                            <a href="/2019/05/14/Java Overflow and Underflow/#post-footer" class="postShorten-excerpt_link link">
+                                评论和共享
+                            </a>
+                        </p>
+                    
+                </div>
+            
+        </div>
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
                         <a class="link-unstyled" href="/2018/11/24/使用zip4j遇到的CRC错误（invalid CRC for file）———_字符造成的异常/">
                             使用zip4j遇到的CRC错误（invalid CRC for file）———&#34;_&#34;字符造成的异常
                         </a>
@@ -244,6 +349,8 @@
 <p>然后我在zip4j找到了两个讨论CRC问题的贴子<a href="http://www.lingala.net/zip4j/forum/index.php?topic=365.0" target="_blank" rel="noopener">#贴子1</a>、  <a href="http://www.lingala.net/zip4j/forum/index.php?topic=332.0" target="_blank" rel="noopener">#贴子2</a>，发现zip4j最新版本（1.3.2）确实存在CRC的bug。</p>
 <p>但是奇怪的是C#版本为什么也会有类似的问题？于是我用7Zip的file manager查看了用户提交的压缩包（存在异常）和我自己重新生成的压缩包（一切正常），在仔细对比之后发现异常压缩包停止解压的文件名包含<code>_</code>，用file manager查看发现异常的压缩包文件名中的<code>_</code>显示为<code>?</code>，而正常的压缩包则正常显示<code>_</code>。</p>
 <p>由于客户那边周末休假，所以无法得知客户对压缩包做过什么，也暂时无法获取用户的系统情况，但是我猜测可能是由于客户系统编码的原因导致<code>_</code>字符出现了异常，所以目前的解决方案是禁止客户在命名的时候使用<code>_</code>。</p>
+<hr>
+<p>2019-05-14更新：<br>此问题根源与zip4j无关，如需了解造成文中问题的根源请移步另一篇文章<a href="https://grxself.github.io/2019/05/14/光驱异常导致的数据读取异常/">光驱异常导致的数据读取异常</a></p>
 
                     
                         
@@ -332,7 +439,7 @@
 
                 <footer id="footer" class="main-content-wrap">
     <span class="copyrights">
-        Copyrights &copy; 2018 GRXself. All Rights Reserved.
+        Copyrights &copy; 2019 GRXself. All Rights Reserved.
     </span>
 </footer>
 
