@@ -256,9 +256,9 @@
 <h4 id="Access-Control-Allow-Methods"><a href="#Access-Control-Allow-Methods" class="headerlink" title="Access-Control-Allow-Methods"></a>Access-Control-Allow-Methods</h4><p>A comma separated list of HTTP request type verbs (eg. <code>GET</code>, <code>POST</code>) which the server is willing to support.</p>
 <h4 id="Origin"><a href="#Origin" class="headerlink" title="Origin"></a>Origin</h4><p>This header is part of the request that the client is making, and will contain the domain from which the application is started. <code>For security reasons browsers will not allow you to overwrite this value.</code></p>
 <h2 id="2-For-front-end"><a href="#2-For-front-end" class="headerlink" title="2. For front end"></a>2. For front end</h2><p>There is nothing front end DEV should do. The browser helps us check CORS policy, if you request an api that not been properly configured, you’ll see something like this:</p>
-<p><img src="browserconsole1.png" alt="chrome console" title="chrome console"></p>
-<p>(If you can not load the picture, here is the content:</p>
-<p><code>Access to XMLHttpRequest at &#39;https://localhost:5001/api/products&#39; from origin &#39;http://localhost:8080&#39; has been blocked by CORS policy: No &#39;Access-Control-Allow-Origin&#39; header is present on the requested resource.</code>)</p>
+<img src="/2019/09/12/Tricky-Things-in-CORS/browserconsole1.png" title="chrome console">
+<p>If you can not load the picture, here is the content:</p>
+<p><code>Access to XMLHttpRequest at &#39;https://localhost:5001/api/products&#39; from origin &#39;http://localhost:8080&#39; has been blocked by CORS policy: No &#39;Access-Control-Allow-Origin&#39; header is present on the requested resource.</code></p>
 <h2 id="3-For-back-end-One-tricky-here"><a href="#3-For-back-end-One-tricky-here" class="headerlink" title="3. For back end (One tricky here!)"></a>3. For back end (One tricky here!)</h2><p>Back end DEV should handle the request and confirm whether allow the origin to access the resource.</p>
 <p>Taking ASP.NET Core as an example, you could follow this <a href="https://docs.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-2.2" target="_blank" rel="noopener">article</a> to configure CORS.</p>
 <p>But it’s really tricky that back end still give its response with data even you set the CORS policy when using the ASP.NET Core 2.2 .</p>
