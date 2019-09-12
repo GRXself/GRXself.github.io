@@ -212,6 +212,93 @@
             <div class="postShorten-header">
                 <h1 class="postShorten-title">
                     
+                        <a class="link-unstyled" href="/2019/09/12/Tricky-Things-in-CORS/">
+                            Tricky Things in CORS
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2019-09-12T13:57:23+08:00">
+	
+		    9月 12, 2019
+    	
+    </time>
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-content">
+                    <h2 id="1-Basic-concept-about-CORS"><a href="#1-Basic-concept-about-CORS" class="headerlink" title="1. Basic concept about CORS"></a>1. Basic concept about CORS</h2><p>Cross-Origin Resource Sharing(CORS) is a mechanism that checks if there is a cross origin request comes up. It uses additional HTTP headers to help browsers determine whether this occurs.</p>
+<h3 id="Same-origin"><a href="#Same-origin" class="headerlink" title="Same origin"></a>Same origin</h3><p>Two URLs have the same origin if they have identical schemes, hosts, and ports (<a href="https://tools.ietf.org/html/rfc6454" target="_blank" rel="noopener">RFC 6454</a>).</p>
+<p>These two URLs shares the same origin:</p>
+<ul>
+<li><code>https://example.com/fake.html</code></li>
+<li><code>https://example.com/another.html</code></li>
+</ul>
+<p>These URLs have different origins than the previous twos:</p>
+<ul>
+<li><code>https://example.net</code> - Different domain</li>
+<li><code>https://www.example.com/fake.html</code> - Different subdomain</li>
+<li><code>http://example.com/fake.html</code> - Different scheme(protocol)</li>
+<li><code>http://example.com:5001/fake.html</code> - Different port</li>
+</ul>
+<h3 id="Additional-HTTP-headers-Thanks-to-this-article"><a href="#Additional-HTTP-headers-Thanks-to-this-article" class="headerlink" title="Additional HTTP headers (Thanks to this article)"></a>Additional HTTP headers (Thanks to this <a href="https://medium.com/@baphemot/understanding-cors-18ad6b478e2b" target="_blank" rel="noopener">article</a>)</h3><p>CORS uses a few HTTP headers — both in request and response — but the ones you must understand in order to be able to continue working are:</p>
+<h4 id="Access-Control-Allow-Origin"><a href="#Access-Control-Allow-Origin" class="headerlink" title="Access-Control-Allow-Origin"></a>Access-Control-Allow-Origin</h4><p>This header is meant to be <code>returned by the server</code>, and indicate what client-domains are allowed to access its resources. The value can be:</p>
+<ul>
+<li><code>*</code> — allow any domain</li>
+<li>a fully qualified domain name (eg. <a href="https://example.com" target="_blank" rel="noopener">https://example.com</a>)</li>
+</ul>
+<p>If you require the client to pass authentication headers (e.g. cookies) the value can not be <code>*</code> — it must be a fully qualified domain!</p>
+<h4 id="Access-Control-Allow-Credentials"><a href="#Access-Control-Allow-Credentials" class="headerlink" title="Access-Control-Allow-Credentials"></a>Access-Control-Allow-Credentials</h4><p>This header is only required to be present in the response if your server supports authentication via cookies. The only valid value for this case is <code>true</code>.</p>
+<h4 id="Access-Control-Allow-Headers"><a href="#Access-Control-Allow-Headers" class="headerlink" title="Access-Control-Allow-Headers"></a>Access-Control-Allow-Headers</h4><p>Provides a comma separated list of request header values the server is willing to support. If you use custom headers (eg. <code>x-authentication-token</code> you need to return it in this ACA header response to <code>OPTIONS</code> call, otherwise the request will be blocked.</p>
+<h4 id="Access-Control-Expose-Headers"><a href="#Access-Control-Expose-Headers" class="headerlink" title="Access-Control-Expose-Headers"></a>Access-Control-Expose-Headers</h4><p>Similarly, this response should contain a list of headers that will be present in the actual response to the call and should be made available to the client. All other headers will be restricted.</p>
+<h4 id="Access-Control-Allow-Methods"><a href="#Access-Control-Allow-Methods" class="headerlink" title="Access-Control-Allow-Methods"></a>Access-Control-Allow-Methods</h4><p>A comma separated list of HTTP request type verbs (eg. <code>GET</code>, <code>POST</code>) which the server is willing to support.</p>
+<h4 id="Origin"><a href="#Origin" class="headerlink" title="Origin"></a>Origin</h4><p>This header is part of the request that the client is making, and will contain the domain from which the application is started. <code>For security reasons browsers will not allow you to overwrite this value.</code></p>
+<h2 id="2-For-front-end"><a href="#2-For-front-end" class="headerlink" title="2. For front end"></a>2. For front end</h2><p>There is nothing front end DEV should do. The browser helps us check CORS policy, if you request an api that not been properly configured, you’ll see something like this:</p>
+<p><img src="browserconsole1.png" alt="chrome console" title="chrome console"></p>
+<p>(If you can not load the picture, here is the content:</p>
+<p><code>Access to XMLHttpRequest at &#39;https://localhost:5001/api/products&#39; from origin &#39;http://localhost:8080&#39; has been blocked by CORS policy: No &#39;Access-Control-Allow-Origin&#39; header is present on the requested resource.</code>)</p>
+<h2 id="3-For-back-end-One-tricky-here"><a href="#3-For-back-end-One-tricky-here" class="headerlink" title="3. For back end (One tricky here!)"></a>3. For back end (One tricky here!)</h2><p>Back end DEV should handle the request and confirm whether allow the origin to access the resource.</p>
+<p>Taking ASP.NET Core as an example, you could follow this <a href="https://docs.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-2.2" target="_blank" rel="noopener">article</a> to configure CORS.</p>
+<p>But it’s really tricky that back end still give its response with data even you set the CORS policy when using the ASP.NET Core 2.2 .</p>
+<p>Let’s consider this problem, CORS middleware just set the headers. So a request from a NOT ALLOWED origin just receives the response without <code>Access-Control-Allow-Origin</code> included in its header. And then, the browser will give an error message, script can not read the response.(But browser do receive the respense with data).</p>
+<h2 id="4-Tricky-thing-in-redirection"><a href="#4-Tricky-thing-in-redirection" class="headerlink" title="4. Tricky thing in redirection"></a>4. Tricky thing in redirection</h2><p>Back end CORS policy will check <code>Origin</code> in request header, making sure the <code>Origin</code> is configured in its policy. But when a redirection occurs, browser will set <code>Origin</code> to <code>null</code>. That means if you have configured specific origin policies, the <code>null Origin</code> will result in failure of policy check in back end. So the response header will not include <code>Access-Control-Allow-Origin</code> in its header. Browser will give an error and block script to read the response.</p>
+<h2 id="5-One-extension"><a href="#5-One-extension" class="headerlink" title="5. One extension"></a>5. One extension</h2><h3 id="How-does-setting-Origin-to-null-in-a-redirected-CORS-request-protect-against-a-confused-deputy-attack"><a href="#How-does-setting-Origin-to-null-in-a-redirected-CORS-request-protect-against-a-confused-deputy-attack" class="headerlink" title="How does setting Origin to null in a redirected CORS request protect against a confused deputy attack?"></a><a href="https://security.stackexchange.com/questions/171711/how-does-setting-origin-to-null-in-a-redirected-cors-request-protect-against-a-c" target="_blank" rel="noopener">How does setting Origin to null in a redirected CORS request protect against a confused deputy attack?</a></h3><p>In the link above, Jonah Benton answered this question with a cool example, if you are interested in security problem, please read this.</p>
+<p>In case the link goes down, I just paste the answer here:</p>
+<p><code>That paragraph is tersely written, and the use of &quot;redirects to another resource at a new origin&quot; in the first sentence isn&#39;t quite right.</code></p>
+<p><code>Here&#39;s a simple contrived example. Let&#39;s say you are malicious, and there is a web application that uses the services of a privileged API via CORS, so the web application&#39;s Origin is trusted by the privileged API. And let&#39;s say you want to get access to the data behind that privileged API, but your Origin of course is not trusted.</code></p>
+<p><code>You create a simple useful service that you offer via CORS, and you get the web application to include your service in a page- any page- under its trusted Origin. That page does not need to access the privileged API.</code></p>
+<p><code>(Of course, once you&#39;re in the page of your victim you can do whatever you want, but bear with me.)</code></p>
+<p><code>If you decide to change your CORS service from issuing a 200 with some data to issue a 3xx to the privileged API- crossing resource domains- this creates a trust problem.</code></p>
+<p><code>The actual Origin- the page that embedded your resource- will be trusted by the privileged API. But it didn&#39;t issue the request, and it may not want to be talking to the privileged API at this particular point in time.</code></p>
+<p><code>Instead, you issued the redirect, and while you are trusted, in part, by the Origin, you are not trusted by the privileged API. If the browser follows your 3xx and sends along the Origin, you get to illegitimately piggy back on the trust given by the privileged API to the Origin.</code></p>
+<p><code>What is the browser to do? A reasonable answer is to not follow the 3xx at all, but that would disallow use cases for which trust is not concern. Issuing the request with a &quot;null&quot; Origin allows those use cases, but prevents the exploitation of trust that sending along the original Origin header would allow.</code></p>
+
+                    
+                        
+
+                    
+                    
+                        <p>
+                            <a href="/2019/09/12/Tricky-Things-in-CORS/#post-footer" class="postShorten-excerpt_link link">
+                                评论和共享
+                            </a>
+                        </p>
+                    
+                </div>
+            
+        </div>
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
                         <a class="link-unstyled" href="/2019/08/28/TW体验之旅/">
                             ThoughtWorks体验之旅-实习杂记
                         </a>
