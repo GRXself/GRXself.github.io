@@ -1,0 +1,566 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="GRXself&#39;s blog">
+    <title>ASP.NET Core Model Binding - GRXself&#39;s blog</title>
+    <meta name="author" content="GRXself">
+    
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"GRXself","sameAs":[],"image":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg"},"articleBody":"I just begin learning vue, vuex and axios with my ASP.NET Core back end recent days. When I set all the thing good in my front end(vue, vuex and axios all went well) and sent a request with json data, the ASP.NET Core back end web api received nothing(Something indeed received, but the parameter roomId is set to zero, just see the code below).\n\nAxios code snippet:\n123456789101112131415161718import axios from &quot;axios&quot;;const apiClient = axios.create(&#123;  baseURL: `https://localhost:5001`,  withCredentials: false,  headers: &#123;    Accept: &quot;application/json&quot;,    &quot;Content-Type&quot;: &quot;application/json&quot;  &#125;&#125;);export default &#123;  createRoom(roomId) &#123;    return apiClient.post(&quot;/home/createroom&quot;, &#123;      roomId: parseInt(roomId)    &#125;);  &#125;&#125;;\nBack end ASP.NET Core code snippet:\n123456789101112131415161718192021public ActionResult&lt;CreateRoomResultModel&gt; CreateRoom(int roomId)&#123;    var room = RoomList.FindRoom(roomId);    if (!(room is null))    &#123;        return new CreateRoomResultModel()        &#123;            ExistRoom = true        &#125;;    &#125;    _logger.LogInformation(&quot;Creating room: &quot; + roomId);    RoomList.CreateRoom(roomId);    HttpContext.Session.SetInt32(KeyRoomId, roomId);    Response.Cookies.Append(KeyRoomId, roomId.ToString());    return new CreateRoomResultModel();&#125;\n“Request Payload” vs “Form Data”Cause that’s my first step using a standalone front end, so I first doubt that something went wrong with my axios js code.\nI compared the requests from my MVC view(using jQuery) and standalone vue front end. In the chrome console, I just found that jQuery ajax request sent back with form data when axios sent back with request payload. So I wondered is something wrong here.\nFrom stackoverflow, I catch this one. I learned that they had sent different Content-Type. The request from axios was application/json, so it put the data into the request body and called Request Payload. Another request from jQuery ajax was application/x-www-form-urlencoded or multipart/form-data, so it called Form Data.\nObviously, if I used axios sent Form Data instead of Request Payload, the problem can be solved. But back end must be able to accept json data. So I went on to find the way.\nModel bindingModel binding is a process that helps us mapping HTTP request content with arguments in the controller action we invoke.\nFor the Form Data condition, model binding works fine. But when encontering Request Payload, ordinary MVC controller won’t do the binding. If you want to bind json data, please add the [FromBody] attribute to the params in action. Or you can use the [ApiController] attribute instead.\nUsing [FromBody]:\n1234567public ActionResult&lt;CreateRoomResultModel&gt; CreateRoom([FromBody] RoomInfoModel roomInfoModel)&#123;...&#125;public class RoomInfoModel&#123;    public int RoomId &#123; get; set; &#125;&#125;\nOr using [ApiController] instead:\n1234[Route(&quot;[controller]/[action]&quot;)][ApiController]public class HomeController : ControllerRoomBase&#123;...&#125;\nIf you want to learn more, please read Model binding JSON POSTs in ASP.NET Core and Accepting Raw Request Body Content in ASP.NET Core API Controllers.\nTricky thing in model bindingYou must be curious that I changed the argument in my back end controller action, right? This truely cost me a few hours finding that I can not get primitive types from my body directly. MVC waits a model to bind json, not the primitive types.\nWant to learn more about this tricky thing? Read this on stackoverflow.\n","dateCreated":"2019-09-17T15:17:48+08:00","dateModified":"2019-09-18T12:22:28+08:00","datePublished":"2019-09-17T15:17:48+08:00","description":"I just begin learning vue, vuex and axios with my ASP.NET Core back end recent days. When I set all the thing good in my front end(vue, vuex and axios all went well) and sent a request with json data, the ASP.NET Core back end web api received nothing(Something indeed received, but the parameter roomId is set to zero, just see the code below).","headline":"ASP.NET Core Model Binding","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://grxself.github.io/2019/09/17/ASP-NET-Core-Model-Binding/"},"publisher":{"@type":"Organization","name":"GRXself","sameAs":[],"image":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg","logo":{"@type":"ImageObject","url":"https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg"}},"url":"https://grxself.github.io/2019/09/17/ASP-NET-Core-Model-Binding/","keywords":"ASP.NET Core, Model Binding, Web Api, Axios, Tricky, 坑"}</script>
+    <meta name="description" content="I just begin learning vue, vuex and axios with my ASP.NET Core back end recent days. When I set all the thing good in my front end(vue, vuex and axios all went ">
+<meta name="keywords" content="ASP.NET Core,Model Binding,Web Api,Axios,Tricky,坑">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="ASP.NET Core Model Binding">
+<meta property="og:url" content="https://grxself.github.io/2019/09/17/ASP-NET-Core-Model-Binding/index.html">
+<meta property="og:site_name" content="GRXself&#39;s blog">
+<meta property="og:description" content="I just begin learning vue, vuex and axios with my ASP.NET Core back end recent days. When I set all the thing good in my front end(vue, vuex and axios all went well) and sent a request with json data,">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2019-09-18T04:22:28.986Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ASP.NET Core Model Binding">
+<meta name="twitter:description" content="I just begin learning vue, vuex and axios with my ASP.NET Core back end recent days. When I set all the thing good in my front end(vue, vuex and axios all went well) and sent a request with json data,">
+<meta name="twitter:creator" content="@GRXself">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-1udptkpril81ozu8ifd8zpujn7ipu7lefxsiu5gxx0dpnzntdx6dusvki3ao.min.css">
+    <!--STYLES END-->
+    
+
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">GRXself&#39;s blog</a>
+    </div>
+    
+        
+            <a  class="header-right-picture "
+                href="#about">
+        
+        
+            <img class="header-picture" src="https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg" alt="Author&#39;s picture"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">GRXself</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>404 NOT FOUND →)0v0 ）</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/ "
+                            
+                            title="Home"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-categories"
+                            
+                            title="Categories"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-tags"
+                            
+                            title="Tags"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-archives"
+                            
+                            title="Archives"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link open-algolia-search"
+                             href="#search"
+                            
+                            title="Search"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="#about"
+                            
+                            title="About"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/atom.xml"
+                            
+                            title="RSS"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-lg fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            ASP.NET Core Model Binding
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2019-09-17T15:17:48+08:00">
+	
+		    Sep 17, 2019
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/ASP-NET-Core/">ASP.NET Core</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>I just begin learning vue, vuex and axios with my ASP.NET Core back end recent days. When I set all the thing good in my front end(vue, vuex and axios all went well) and sent a request with json data, the ASP.NET Core back end web api received nothing(Something indeed received, but the parameter roomId is set to zero, just see the code below).</p>
+<a id="more"></a>
+<p>Axios code snippet:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">import axios from &quot;axios&quot;;</span><br><span class="line"></span><br><span class="line">const apiClient = axios.create(&#123;</span><br><span class="line">  baseURL: `https://localhost:5001`,</span><br><span class="line">  withCredentials: false,</span><br><span class="line">  headers: &#123;</span><br><span class="line">    Accept: &quot;application/json&quot;,</span><br><span class="line">    &quot;Content-Type&quot;: &quot;application/json&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">export default &#123;</span><br><span class="line">  createRoom(roomId) &#123;</span><br><span class="line">    return apiClient.post(&quot;/home/createroom&quot;, &#123;</span><br><span class="line">      roomId: parseInt(roomId)</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>Back end ASP.NET Core code snippet:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public ActionResult&lt;CreateRoomResultModel&gt; CreateRoom(int roomId)</span><br><span class="line">&#123;</span><br><span class="line">    var room = RoomList.FindRoom(roomId);</span><br><span class="line"></span><br><span class="line">    if (!(room is null))</span><br><span class="line">    &#123;</span><br><span class="line">        return new CreateRoomResultModel()</span><br><span class="line">        &#123;</span><br><span class="line">            ExistRoom = true</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    _logger.LogInformation(&quot;Creating room: &quot; + roomId);</span><br><span class="line"></span><br><span class="line">    RoomList.CreateRoom(roomId);</span><br><span class="line"></span><br><span class="line">    HttpContext.Session.SetInt32(KeyRoomId, roomId);</span><br><span class="line">    Response.Cookies.Append(KeyRoomId, roomId.ToString());</span><br><span class="line"></span><br><span class="line">    return new CreateRoomResultModel();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="“Request-Payload”-vs-“Form-Data”"><a href="#“Request-Payload”-vs-“Form-Data”" class="headerlink" title="“Request Payload” vs “Form Data”"></a>“Request Payload” vs “Form Data”</h2><p>Cause that’s my first step using a standalone front end, so I first doubt that something went wrong with my axios js code.</p>
+<p>I compared the requests from my MVC view(using jQuery) and standalone vue front end. In the chrome console, I just found that jQuery ajax request sent back with form data when axios sent back with request payload. So I wondered is something wrong here.</p>
+<p>From stackoverflow, I catch this <a href="https://stackoverflow.com/questions/23118249/whats-the-difference-between-request-payload-vs-form-data-as-seen-in-chrome" target="_blank" rel="noopener">one</a>. I learned that they had sent different <code>Content-Type</code>. The request from axios was <code>application/json</code>, so it put the data into the request body and called <code>Request Payload</code>. Another request from jQuery ajax was <code>application/x-www-form-urlencoded</code> or <code>multipart/form-data</code>, so it called <code>Form Data</code>.</p>
+<p>Obviously, if I used axios sent <code>Form Data</code> instead of <code>Request Payload</code>, the problem can be solved. But back end must be able to accept json data. So I went on to find the way.</p>
+<h2 id="Model-binding"><a href="#Model-binding" class="headerlink" title="Model binding"></a>Model binding</h2><p>Model binding is a process that helps us mapping HTTP request content with arguments in the controller action we invoke.</p>
+<p>For the <code>Form Data</code> condition, model binding works fine. But when encontering <code>Request Payload</code>, ordinary MVC controller won’t do the binding. If you want to bind json data, please add the <code>[FromBody]</code> attribute to the params in action. Or you can use the <code>[ApiController]</code> attribute instead.</p>
+<p>Using <code>[FromBody]</code>:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public ActionResult&lt;CreateRoomResultModel&gt; CreateRoom([FromBody] RoomInfoModel roomInfoModel)</span><br><span class="line">&#123;...&#125;</span><br><span class="line"></span><br><span class="line">public class RoomInfoModel</span><br><span class="line">&#123;</span><br><span class="line">    public int RoomId &#123; get; set; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Or using <code>[ApiController]</code> instead:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[Route(&quot;[controller]/[action]&quot;)]</span><br><span class="line">[ApiController]</span><br><span class="line">public class HomeController : ControllerRoomBase</span><br><span class="line">&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<p>If you want to learn more, please read <a href="https://andrewlock.net/model-binding-json-posts-in-asp-net-core/" target="_blank" rel="noopener">Model binding JSON POSTs in ASP.NET Core</a> and <a href="https://weblog.west-wind.com/posts/2017/Sep/14/Accepting-Raw-Request-Body-Content-in-ASPNET-Core-API-Controllers" target="_blank" rel="noopener">Accepting Raw Request Body Content in ASP.NET Core API Controllers</a>.</p>
+<h2 id="Tricky-thing-in-model-binding"><a href="#Tricky-thing-in-model-binding" class="headerlink" title="Tricky thing in model binding"></a>Tricky thing in model binding</h2><p>You must be curious that I changed the argument in my back end controller action, right? This truely cost me a few hours finding that I can not get primitive types from my body directly. MVC waits a model to bind json, not the primitive types.</p>
+<p>Want to learn more about this tricky thing? Read <a href="https://stackoverflow.com/questions/49082543/cannot-post-primitive-types-in-asp-net-core-2-0" target="_blank" rel="noopener">this</a> on stackoverflow.</p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/ASP-NET-Core/">ASP.NET Core</a> <a class="tag tag--primary tag--small t-link" href="/tags/Axios/">Axios</a> <a class="tag tag--primary tag--small t-link" href="/tags/Model-Binding/">Model Binding</a> <a class="tag tag--primary tag--small t-link" href="/tags/Tricky/">Tricky</a> <a class="tag tag--primary tag--small t-link" href="/tags/Web-Api/">Web Api</a> <a class="tag tag--primary tag--small t-link" href="/tags/坑/">坑</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/09/12/Tricky-Things-in-CORS/" data-tooltip="Tricky Things in CORS" aria-label="NEXT: Tricky Things in CORS">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://grxself.github.io/2019/09/17/ASP-NET-Core-Model-Binding/" title="Share on Facebook">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://grxself.github.io/2019/09/17/ASP-NET-Core-Model-Binding/" title="Share on Twitter">
+                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://grxself.github.io/2019/09/17/ASP-NET-Core-Model-Binding/" title="Share on Google+">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://grxself.github.io/2019/09/17/ASP-NET-Core-Model-Binding/" title="Share on Weibo">
+                    <i class="fa fa-weibo" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment-o"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2019 GRXself. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/09/12/Tricky-Things-in-CORS/" data-tooltip="Tricky Things in CORS" aria-label="NEXT: Tricky Things in CORS">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://grxself.github.io/2019/09/17/ASP-NET-Core-Model-Binding/" title="Share on Facebook">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://grxself.github.io/2019/09/17/ASP-NET-Core-Model-Binding/" title="Share on Twitter">
+                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://grxself.github.io/2019/09/17/ASP-NET-Core-Model-Binding/" title="Share on Google+">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://grxself.github.io/2019/09/17/ASP-NET-Core-Model-Binding/" title="Share on Weibo">
+                    <i class="fa fa-weibo" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment-o"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+    <i id="btn-close-shareoptions" class="fa fa-close"></i>
+    <ul class="share-options">
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://grxself.github.io/2019/09/17/ASP-NET-Core-Model-Binding/">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i><span>Share on Facebook</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://grxself.github.io/2019/09/17/ASP-NET-Core-Model-Binding/">
+                    <i class="fa fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://grxself.github.io/2019/09/17/ASP-NET-Core-Model-Binding/">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://grxself.github.io/2019/09/17/ASP-NET-Core-Model-Binding/">
+                    <i class="fa fa-weibo" aria-hidden="true"></i><span>Share on Weibo</span>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-remove"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://tva2.sinaimg.cn/crop.116.23.429.429.180/82e78bccjw8enznr15gdwj20g40lh0tt.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">GRXself</h4>
+        
+            <div id="about-card-bio"><p>404 NOT FOUND →)0v0 ）</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>STUDENT</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker"></i>
+                <br/>
+                China-Xi&#39;an
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-yhuo2grt8r7qkqumzgjoglkfbicl1thukjgmla6jopu56zpcowfedi5zjcor.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://grxself.github.io/2019/09/17/ASP-NET-Core-Model-Binding/';
+                 
+                    this.page.identifier = '2019/09/17/ASP-NET-Core-Model-Binding/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'grxself';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+
+    </body>
+</html>
